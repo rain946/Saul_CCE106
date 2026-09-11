@@ -1,220 +1,143 @@
-import { useState } from 'react';
-import { Button, Modal, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+// app/(tabs)/index.tsx
 
-export default function Calculator() {
-  const [number1, setNumber1] = useState('');
-  const [number2, setNumber2] = useState('');
-  const [result, setResult] = useState('');
-  const [modalVisible, setModalVisible] = useState(false);
+import {
+  ScrollView,
+  StyleSheet,
+  View,
+} from 'react-native';
 
-  function calculate(operation: string) {
-    if (number1 === '' || number2 === '') {
-      setResult('Please enter both numbers.');
-      setModalVisible(true);
-      return;
-    }
+import InventoryHeader from '@/components/InventoryHeader';
+import InventoryMetric from '@/components/InventoryMetric';
+import InventoryAction from '@/components/InventoryAction';
+import InventorySectionHeader from '@/components/InventorySectionHeader';
+import StockItem from '@/components/StockItem';
 
-    const firstNumber = Number(number1);
-    const secondNumber = Number(number2);
+import {
+  COLORS,
+  SPACING,
+} from '@/constants/theme';
 
-    if (isNaN(firstNumber) || isNaN(secondNumber)) {
-      setResult('Please enter valid numbers.');
-      setModalVisible(true);
-      return;
-    }
-
-    if (operation === 'divide' && secondNumber === 0) {
-      setResult('Cannot divide by zero.');
-      setModalVisible(true);
-      return;
-    }
-
-    let answer = 0;
-
-    if (operation === 'add') {
-      answer = firstNumber + secondNumber;
-    } else if (operation === 'subtract') {
-      answer = firstNumber - secondNumber;
-    } else if (operation === 'multiply') {
-      answer = firstNumber * secondNumber;
-    } else if (operation === 'divide') {
-      answer = firstNumber / secondNumber;
-    }
-
-    setResult(String(answer));
-    setModalVisible(true);
-  }
-
+export default function InventoryDashboard() {
   return (
-    <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
-      <View style={styles.card}>
-        <Text style={styles.heading}>CALCULATOR</Text>
-        <Text style={styles.title}>Simple Calculator</Text>
-        <Text style={styles.subtitle}>Enter two values and select an operation.</Text>
-
-        <Text style={styles.label}>FIRST VALUE</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="First number"
-          keyboardType="numeric"
-          value={number1}
-          onChangeText={setNumber1}
+    <View style={styles.container}>
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.content}
+      >
+        <InventoryHeader
+          title="Inventory"
+          subtitle="Stock management dashboard"
         />
 
-        <Text style={styles.label}>SECOND VALUE</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Second number"
-          keyboardType="numeric"
-          value={number2}
-          onChangeText={setNumber2}
+        <InventorySectionHeader title="Overview" />
+
+        <View style={styles.metrics}>
+          <InventoryMetric
+            icon="cube-outline"
+            label="ITEMS"
+            value="248"
+            note="Total products"
+            iconBackground={COLORS.softBlue}
+            iconColor={COLORS.primary}
+          />
+
+          <InventoryMetric
+            icon="checkmark-circle-outline"
+            label="IN STOCK"
+            value="216"
+            note="Available items"
+            iconBackground={COLORS.softGreen}
+            iconColor={COLORS.success}
+          />
+
+          <InventoryMetric
+            icon="alert-circle-outline"
+            label="LOW STOCK"
+            value="18"
+            note="Needs attention"
+            iconBackground={COLORS.softOrange}
+            iconColor={COLORS.warning}
+          />
+        </View>
+
+        <InventorySectionHeader title="Quick Actions" />
+
+        <View style={styles.actions}>
+          <InventoryAction
+            icon="add-circle-outline"
+            title="Add Item"
+            description="Create a new inventory item"
+          />
+
+          <InventoryAction
+            icon="swap-horizontal-outline"
+            title="Stock In"
+            description="Record incoming stock"
+          />
+
+          <InventoryAction
+            icon="remove-circle-outline"
+            title="Stock Out"
+            description="Record released stock"
+          />
+        </View>
+
+        <InventorySectionHeader
+          title="Stock Alerts"
+          action="View All"
         />
 
-        <Text style={styles.operationHeading}>SELECT OPERATION</Text>
-        <View style={styles.buttonGrid}>
-          <View style={styles.button}>
-            <Button title="Add  +" onPress={() => calculate('add')} color="black" />
-          </View>
-          <View style={styles.button}>
-            <Button title="Subtract  −" onPress={() => calculate('subtract')} color="black" />
-          </View>
-          <View style={styles.button}>
-            <Button title="Multiply  ×" onPress={() => calculate('multiply')} color="black" />
-          </View>
-          <View style={styles.button}>
-            <Button title="Divide  ÷" onPress={() => calculate('divide')} color="black" />
-          </View>
-        </View>
-      </View>
+        <StockItem
+          icon="headset-outline"
+          name="Wireless Headset"
+          category="Electronics"
+          quantity="4 units"
+          status="Low Stock"
+        />
 
-      <Modal
-        animationType="fade"
-        transparent={true}
-        visible={modalVisible}
-        onRequestClose={() => setModalVisible(false)}>
-        <View style={styles.modalBackground}>
-          <View style={styles.modalBox}>
-            <Text style={styles.modalLabel}>CALCULATION RESULT</Text>
-            <Text style={styles.modalTitle}>Result</Text>
-            <Text style={styles.modalResult}>{result}</Text>
-            <Button title="Close" onPress={() => setModalVisible(false)} color="black" />
-          </View>
-        </View>
-      </Modal>
-    </ScrollView>
+        <StockItem
+          icon="shirt-outline"
+          name="Company Polo Shirt"
+          category="Apparel"
+          quantity="8 units"
+          status="Low Stock"
+        />
+
+        <StockItem
+          icon="print-outline"
+          name="Printer Ink"
+          category="Office Supplies"
+          quantity="12 units"
+          status="In Stock"
+        />
+      </ScrollView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    flexGrow: 1,
-    justifyContent: 'center',
-    backgroundColor: '#111111',
-    paddingHorizontal: 20,
-    paddingVertical: 40,
+    flex: 1,
+    backgroundColor: COLORS.background,
   },
-  card: {
-    backgroundColor: 'white',
-    borderRadius: 4,
-    padding: 24,
-    elevation: 6,
-    shadowColor: 'black',
-    shadowOpacity: 0.25,
-    shadowRadius: 10,
-    borderColor: '#cccccc',
-    borderWidth: 1,
-    maxWidth: 520,
-    width: '100%',
-    alignSelf: 'center',
+
+  content: {
+    padding: SPACING.xl,
+    paddingTop: 56,
+    paddingBottom: SPACING.xxxl,
   },
-  heading: {
-    fontSize: 11,
-    fontWeight: 'bold',
-    letterSpacing: 3,
-    textAlign: 'center',
-  },
-  title: {
-    fontSize: 30,
-    fontWeight: 'bold',
-    marginTop: 8,
-    textAlign: 'center',
-  },
-  subtitle: {
-    color: '#555555',
-    marginBottom: 28,
-    marginTop: 8,
-    textAlign: 'center',
-  },
-  label: {
-    fontSize: 11,
-    fontWeight: 'bold',
-    letterSpacing: 1.5,
-    marginBottom: 7,
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: '#333333',
-    borderRadius: 3,
-    fontSize: 17,
-    marginBottom: 18,
-    padding: 13,
-  },
-  operationHeading: {
-    borderTopColor: '#dddddd',
-    borderTopWidth: 1,
-    fontSize: 11,
-    fontWeight: 'bold',
-    letterSpacing: 1.5,
-    marginTop: 4,
-    paddingTop: 20,
-    marginBottom: 12,
-  },
-  buttonGrid: {
+
+  metrics: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 10,
+    justifyContent: 'space-between',
+    marginBottom: SPACING.xxl,
   },
-  button: {
-    borderColor: 'black',
-    borderRadius: 3,
-    borderWidth: 1,
-    flexBasis: '47%',
-    flexGrow: 1,
-    overflow: 'hidden',
-  },
-  modalBackground: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    padding: 20,
-  },
-  modalBox: {
-    width: '100%',
-    maxWidth: 350,
-    backgroundColor: 'white',
-    borderRadius: 4,
-    borderColor: '#cccccc',
-    borderWidth: 1,
-    padding: 28,
-  },
-  modalLabel: {
-    fontSize: 10,
-    fontWeight: 'bold',
-    letterSpacing: 2,
-    marginBottom: 8,
-    textAlign: 'center',
-  },
-  modalTitle: {
-    fontSize: 22,
-    fontWeight: 'bold',
-    textAlign: 'center',
-  },
-  modalResult: {
-    color: 'black',
-    fontSize: 32,
-    fontWeight: 'bold',
-    marginVertical: 20,
-    textAlign: 'center',
+
+  actions: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+    marginBottom: SPACING.xxl,
   },
 });
