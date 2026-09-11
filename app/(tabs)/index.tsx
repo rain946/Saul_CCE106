@@ -1,143 +1,29 @@
-// app/(tabs)/index.tsx
+import { Ionicons } from '@expo/vector-icons';
+import { Link } from 'expo-router';
+import { Pressable, Text, View } from 'react-native';
+import { Heading, Page, palette, s } from '@/components/portal';
+import { courses } from '@/constants/portal';
+import { usePreferences } from '@/components/preferences-context';
 
-import {
-  ScrollView,
-  StyleSheet,
-  View,
-} from 'react-native';
-
-import InventoryHeader from '@/components/InventoryHeader';
-import InventoryMetric from '@/components/InventoryMetric';
-import InventoryAction from '@/components/InventoryAction';
-import InventorySectionHeader from '@/components/InventorySectionHeader';
-import StockItem from '@/components/StockItem';
-
-import {
-  COLORS,
-  SPACING,
-} from '@/constants/theme';
-
-export default function InventoryDashboard() {
-  return (
-    <View style={styles.container}>
-      <ScrollView
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.content}
-      >
-        <InventoryHeader
-          title="Inventory"
-          subtitle="Stock management dashboard"
-        />
-
-        <InventorySectionHeader title="Overview" />
-
-        <View style={styles.metrics}>
-          <InventoryMetric
-            icon="cube-outline"
-            label="ITEMS"
-            value="248"
-            note="Total products"
-            iconBackground={COLORS.softBlue}
-            iconColor={COLORS.primary}
-          />
-
-          <InventoryMetric
-            icon="checkmark-circle-outline"
-            label="IN STOCK"
-            value="216"
-            note="Available items"
-            iconBackground={COLORS.softGreen}
-            iconColor={COLORS.success}
-          />
-
-          <InventoryMetric
-            icon="alert-circle-outline"
-            label="LOW STOCK"
-            value="18"
-            note="Needs attention"
-            iconBackground={COLORS.softOrange}
-            iconColor={COLORS.warning}
-          />
-        </View>
-
-        <InventorySectionHeader title="Quick Actions" />
-
-        <View style={styles.actions}>
-          <InventoryAction
-            icon="add-circle-outline"
-            title="Add Item"
-            description="Create a new inventory item"
-          />
-
-          <InventoryAction
-            icon="swap-horizontal-outline"
-            title="Stock In"
-            description="Record incoming stock"
-          />
-
-          <InventoryAction
-            icon="remove-circle-outline"
-            title="Stock Out"
-            description="Record released stock"
-          />
-        </View>
-
-        <InventorySectionHeader
-          title="Stock Alerts"
-          action="View All"
-        />
-
-        <StockItem
-          icon="headset-outline"
-          name="Wireless Headset"
-          category="Electronics"
-          quantity="4 units"
-          status="Low Stock"
-        />
-
-        <StockItem
-          icon="shirt-outline"
-          name="Company Polo Shirt"
-          category="Apparel"
-          quantity="8 units"
-          status="Low Stock"
-        />
-
-        <StockItem
-          icon="print-outline"
-          name="Printer Ink"
-          category="Office Supplies"
-          quantity="12 units"
-          status="In Stock"
-        />
-      </ScrollView>
+export default function HomeScreen() {
+  const { showStudyTip } = usePreferences();
+  return <Page>
+    <Heading title="Your campus, connected." subtitle="Everything you need for your student journey." />
+    <View style={s.hero}>
+      <View style={s.row}><Text style={[s.eyebrow, { flex: 1 }]}>YOUR PERSONAL SPACE</Text><Ionicons name="sunny-outline" size={30} color={palette.blue} /></View>
+      <Text style={[s.title, { fontSize: 34 }]}>Welcome back,{'\n'}Rainier!</Text>
+      <Text style={s.body}>A fresh start to learn, build, and grow.</Text>
+      <Link href="/profile" style={s.link}>View my profile →</Link>
     </View>
-  );
+    <View style={s.row}>
+      <View style={[s.card, { flex: 1, gap: 6 }]}><Text style={s.eyebrow}>MY COURSES</Text><Text style={s.title}>03</Text><Text style={s.label}>Courses to explore</Text></View>
+      <View style={[s.card, { flex: 1, gap: 6 }]}><Text style={s.eyebrow}>MY PROGRAM</Text><Text style={s.title}>BSIT</Text><Text style={s.label}>Information Technology</Text></View>
+    </View>
+    <View style={{ gap: 5 }}><Text style={s.section}>My courses</Text><Text style={s.body}>Pick a course to see the details.</Text></View>
+    <View style={{ gap: 12 }}>{courses.map((course, index) => <Link key={course.id} href={{ pathname: '/course/[id]', params: { id: course.id } }} asChild><Pressable style={({ pressed }) => [s.card, { gap: 14, opacity: pressed ? 0.65 : 1 }]} accessibilityLabel={'Open ' + course.code + ' course details'}>
+      <View style={s.row}><View style={[s.icon, { backgroundColor: ['#DCEFFC', '#E8ECFC', '#E0F3F1'][index] }]}><Ionicons name={course.icon} size={25} color={palette.blue} /></View><View style={{ flex: 1, gap: 5 }}><Text style={s.section}>{course.code}</Text><Text style={s.body}>{course.title}</Text></View><Ionicons name="chevron-forward" size={20} color={palette.blue} /></View>
+      <Text style={s.eyebrow}>{course.category}</Text>
+    </Pressable></Link>)}</View>
+    {showStudyTip && <View style={[s.hero, { padding: 20 }]}><View style={s.row}><Ionicons name="bulb-outline" size={22} color={palette.blue} /><Text style={s.link}>One step at a time</Text></View><Text style={s.body}>Big projects start with small steps. Choose one thing to learn or improve today.</Text></View>}
+  </Page>;
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: COLORS.background,
-  },
-
-  content: {
-    padding: SPACING.xl,
-    paddingTop: 56,
-    paddingBottom: SPACING.xxxl,
-  },
-
-  metrics: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-between',
-    marginBottom: SPACING.xxl,
-  },
-
-  actions: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-between',
-    marginBottom: SPACING.xxl,
-  },
-});

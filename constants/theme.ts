@@ -1,86 +1,68 @@
 // constants/theme.ts
 
 export const COLORS = {
-  background: '#F5F7FA',
+  navy: '#263A5B',
+  navyDark: '#1B2942',
+  blue: '#5876A5',
+  blueSoft: '#EAF0F8',
+
+  background: '#F3F9FE',
   surface: '#FFFFFF',
-  primary: '#2563EB',
-  primaryDark: '#1D4ED8',
-  secondary: '#0F766E',
-  warning: '#D97706',
-  danger: '#DC2626',
-  success: '#16A34A',
-  textPrimary: '#111827',
-  textSecondary: '#6B7280',
-  textMuted: '#9CA3AF',
-  border: '#E5E7EB',
-  softBlue: '#EFF6FF',
-  softGreen: '#ECFDF5',
-  softOrange: '#FFF7ED',
-  softRed: '#FEF2F2',
-} as const;
+
+  textPrimary: '#202631',
+  textSecondary: '#687180',
+  textMuted: '#9299A5',
+
+  border: '#E1E5EA',
+
+  success: '#3E7C59',
+  successSoft: '#E8F3EC',
+
+  warning: '#B27A2C',
+  warningSoft: '#FBF1DF',
+
+  error: '#A34747',
+  errorSoft: '#F8EAEA',
+
+  white: '#FFFFFF',
+};
+
+export const Colors = {
+  light: { text: '#183C58', background: '#F3F9FE', tint: '#24699C', icon: '#567187', tabIconDefault: '#567187', tabIconSelected: '#24699C' },
+  dark: { text: '#183C58', background: '#F3F9FE', tint: '#24699C', icon: '#567187', tabIconDefault: '#567187', tabIconSelected: '#24699C' },
+};
 
 export const TYPOGRAPHY = {
-  screenTitle: {
-    fontSize: 26,
-    fontWeight: '800' as const,
+  display: 30,
+  title: 24,
+  heading: 19,
+  subheading: 16,
+  body: 14,
+  caption: 12,
+  small: 11,
+};
+
+export const DESIGN = {
+  xs: 5,
+  sm: 10,
+  md: 16,
+  lg: 22,
+  xl: 30,
+
+  radiusSM: 7,
+  radiusMD: 12,
+  radiusLG: 18,
+
+  borderWidth: 1,
+};
+
+export const SHADOW = {
+  shadowColor: '#18202D',
+  shadowOffset: {
+    width: 0,
+    height: 3,
   },
-
-  subtitle: {
-    fontSize: 13,
-    fontWeight: '500' as const,
-  },
-
-  sectionTitle: {
-    fontSize: 17,
-    fontWeight: '800' as const,
-  },
-
-  cardTitle: {
-    fontSize: 14,
-    fontWeight: '700' as const,
-  },
-
-  metricValue: {
-    fontSize: 24,
-    fontWeight: '800' as const,
-  },
-
-  metricLabel: {
-    fontSize: 11,
-    fontWeight: '700' as const,
-    letterSpacing: 0.5,
-  },
-
-  body: {
-    fontSize: 13,
-    fontWeight: '600' as const,
-  },
-
-  caption: {
-    fontSize: 11,
-    fontWeight: '500' as const,
-  },
-
-  action: {
-    fontSize: 12,
-    fontWeight: '700' as const,
-  },
-} as const;
-
-export const SPACING = {
-  xs: 4,
-  sm: 8,
-  md: 12,
-  lg: 16,
-  xl: 20,
-  xxl: 24,
-  xxxl: 32,
-} as const;
-
-export const RADIUS = {
-  sm: 8,
-  md: 12,
-  lg: 16,
-  xl: 20,
-  round: 999,
-} as const;
+  shadowOpacity: 0.07,
+  shadowRadius: 8,
+  elevation: 2,
+};
