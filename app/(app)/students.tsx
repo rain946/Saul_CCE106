@@ -23,7 +23,13 @@ export default function StudentsScreen() {
   }, []);
 
   // TODO EXAM: Use filter() to return students whose name matches the search text.
-  const filteredStudents = students;
+  const normalizedSearch = search.trim().toLowerCase();
+
+  const filteredStudents = students.filter((student) => {
+    const studentName = student.name?.toLowerCase() ?? '';
+    return studentName.includes(normalizedSearch);
+  });
+
 
   return (
     <View style={styles.container}>
