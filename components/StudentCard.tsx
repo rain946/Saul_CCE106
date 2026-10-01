@@ -1,4 +1,5 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { useRouter } from 'expo-router';
 
 // TODO EXAM: Match these fields to the provided API response.
 export type Student = {
@@ -9,22 +10,63 @@ export type Student = {
 };
 
 export default function StudentCard({ student }: { student: Student }) {
+
+  const router = useRouter();
+
   const handleViewDetails = () => {
     // TODO EXAM: Check that the student has an id.
     // TODO EXAM: Use Expo Router to navigate to /student/[id] with this student's id.
-  };
+    if (student.id === undefined || student.id === null) {
+     return;
+    }
 
-  return (
-    <View style={styles.card}>
-      <Text style={styles.name}>{student.name || 'Name not available'}</Text>
-      <Text style={styles.text}>{student.email || 'Email not available'}</Text>
-      {student.course ? <Text style={styles.text}>{student.course}</Text> : null}
-      <Pressable accessibilityRole="button" style={styles.button} onPress={handleViewDetails}>
-        <Text style={styles.buttonText}>View Details</Text>
-      </Pressable>
-    </View>
-  );
+    router.push({
+      pathname: '/student/[id]',
+      params: {
+      id: String(student.id),
+      },
+    });
+  };
+ const hasValidId = student.id !== undefined && student.id !== null;
+
+
+ return (
+   <View style={styles.card}>
+     <Text style={styles.name}>
+       {student.name || 'Name not available'}
+     </Text>
+
+     <Text style={styles.text}>
+       {student.email || 'Email not available'}
+     </Text>
+
+     {student.course ? (
+       <Text style={styles.text}>{student.course}</Text>
+     ) : null}
+
+     <Pressable
+       accessibilityRole="button"
+       style={({ pressed }) => [
+         styles.button,
+         !hasValidId && styles.buttonDisabled,
+         pressed && hasValidId && styles.buttonPressed,
+       ]}
+       onPress={handleViewDetails}
+       disabled={!hasValidId}
+     >
+       <Text
+         style={[
+           styles.buttonText,
+           !hasValidId && styles.buttonTextDisabled,
+         ]}
+       >
+         View Details
+       </Text>
+     </Pressable>
+   </View>
+ );
 }
+
 
 const styles = StyleSheet.create({
   card: { padding: 20, borderRadius: 12, backgroundColor: '#ffffff', marginBottom: 12, gap: 8 },
@@ -32,4 +74,13 @@ const styles = StyleSheet.create({
   text: { color: '#536579' },
   button: { paddingVertical: 12, alignSelf: 'flex-start' },
   buttonText: { color: '#245bb2', fontWeight: '600' },
+  buttonPressed: { opacity: 0.6,},
+
+ buttonDisabled: {
+   opacity: 0.5,
+  },
+  buttonTextDisabled: {
+    color: '#8a99aa',
+  },
+
 });
