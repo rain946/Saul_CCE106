@@ -3,7 +3,7 @@ import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useAuth } from '@/hooks/useAuth';
 
 export default function DashboardScreen() {
-  const { token } = useAuth();
+  const { user, token } = useAuth();
   // TODO EXAM: Replace placeholder user data with authenticated user information.
   return (
       <ScrollView contentContainerStyle={styles.container}>
