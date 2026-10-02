@@ -5,7 +5,9 @@ import { useRouter } from 'expo-router';
 export type Student = {
   id?: string | number;
   name?: string | null;
+  username?: string | null;
   email?: string | null;
+  phone?: string | null;
   course?: string | null;
 };
 

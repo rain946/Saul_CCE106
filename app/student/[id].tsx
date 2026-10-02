@@ -9,6 +9,16 @@ import { type Student } from '@/components/StudentCard';
 import { API_BASE_URL } from '@/constants/api';
 import { useAuth } from '@/hooks/useAuth';
 
+type DummyUserDetail = {
+  id: number;
+  firstName: string;
+  lastName: string;
+  username: string;
+  email: string;
+  phone?: string;
+  university?: string;
+};
+
 export default function StudentDetailsScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
@@ -71,8 +81,16 @@ export default function StudentDetailsScreen() {
           ) {
             throw new Error('Invalid student data received.');
           }
+          const apiUser = data as DummyUserDetail;
 
-          setStudent(data as Student);
+          setStudent({
+            id: apiUser.id,
+            name: `${apiUser.firstName} ${apiUser.lastName}`.trim(),
+            username: apiUser.username,
+            email: apiUser.email,
+            phone: apiUser.phone || null,
+            course: apiUser.university || null,
+          });
         } catch (error) {
           const message =
             error instanceof Error
@@ -117,17 +135,31 @@ export default function StudentDetailsScreen() {
            </View>
          ) : student ? (
            <View style={styles.card}>
-             <Text style={styles.text}>
-               ID: {student.id ?? '—'}
-             </Text>
+             <View style={styles.card}>
+               <Text style={styles.text}>
+                 ID: {student.id ?? '—'}
+               </Text>
 
-             <Text style={styles.text}>
-               Name: {student.name || '—'}
-             </Text>
+               <Text style={styles.text}>
+                 Name: {student.name || '—'}
+               </Text>
 
-             <Text style={styles.text}>
-               Email: {student.email || '—'}
-             </Text>
+               <Text style={styles.text}>
+                 Username: {student.username || '—'}
+               </Text>
+
+               <Text style={styles.text}>
+                 Email: {student.email || '—'}
+               </Text>
+
+               <Text style={styles.text}>
+                 Phone: {student.phone || '—'}
+               </Text>
+
+               <Text style={styles.text}>
+                 University: {student.course || '—'}
+               </Text>
+             </View>
            </View>
          ) : (
            <Text style={styles.text}>
