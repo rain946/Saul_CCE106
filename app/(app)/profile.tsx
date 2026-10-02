@@ -1,40 +1,54 @@
-import {
-  ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, View
-} from 'react-native';
 import { useCallback, useEffect, useState } from 'react';
+import {
+  ActivityIndicator,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+} from 'react-native';
 import { useAuth } from '@/hooks/useAuth';
 import { API_BASE_URL } from '@/constants/api';
 
-type Profile = {
-  id?: string | number;
-  name?: string;
-  username?: string;
-  email?: string;
+type AuthProfile = {
+  id: number;
+  firstName: string;
+  lastName: string;
+  username: string;
+  email: string;
   phone?: string;
-  website?: string;
-
+  university?: string;
+  role?: string;
 };
 
 export default function ProfileScreen() {
   const { token, logout } = useAuth();
+
   // TODO EXAM: Load GET /profile with fetch(), async/await, and the Bearer token.
   // TODO EXAM: Add loading/error state with useState and call the loader using useEffect.
   // TODO EXAM: Check response.ok, handle 401 Unauthorized, and display returned profile data.
 
-  const [profile, setProfile] = useState<Profile | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
-  const loadProfile = useCallback(async () => {
+  const [profile, setProfile] = useState<AuthProfile | null>(null);
+   const [loading, setLoading] = useState(true);
+   const [error, setError] = useState('');
+
+   const loadProfile = useCallback(async () => {
+     if (!token) {
+       setProfile(null);
+       setError('No authentication token available.');
+       setLoading(false);
+       return;
+     }
+
      setLoading(true);
      setError('');
 
      try {
-       const response = await fetch(`${API_BASE_URL}/users/1`, {
-         headers: token
-           ? {
-               Authorization: `Bearer ${token}`,
-             }
-           : undefined,
+       const response = await fetch(`${API_BASE_URL}/auth/me`, {
+         method: 'GET',
+         headers: {
+           Authorization: `Bearer ${token}`,
+         },
        });
 
        if (response.status === 401) {
@@ -56,7 +70,7 @@ export default function ProfileScreen() {
          throw new Error('Invalid profile data received.');
        }
 
-       setProfile(data as Profile);
+       setProfile(data as AuthProfile);
      } catch (error) {
        const message =
          error instanceof Error
@@ -74,74 +88,77 @@ export default function ProfileScreen() {
      void loadProfile();
    }, [loadProfile]);
 
-
-
-
-
    return (
-       <ScrollView contentContainerStyle={styles.container}>
-         <Text style={styles.title}>MY PROFILE</Text>
+     <ScrollView contentContainerStyle={styles.container}>
+       <Text style={styles.title}>MY PROFILE</Text>
 
-         {loading ? (
-           <View style={styles.state}>
-             <ActivityIndicator color="#245bb2" />
-             <Text style={styles.text}>Loading profile…</Text>
-           </View>
-         ) : error ? (
-           <View style={styles.state}>
-             <Text style={styles.error}>{error}</Text>
+       {loading ? (
+         <View style={styles.state}>
+           <ActivityIndicator color="#245bb2" />
+           <Text style={styles.text}>Loading profile…</Text>
+         </View>
+       ) : error ? (
+         <View style={styles.state}>
+           <Text style={styles.error}>{error}</Text>
 
-             <Pressable
-               accessibilityRole="button"
-               style={styles.retryButton}
-               onPress={loadProfile}
-             >
-               <Text style={styles.buttonText}>Try Again</Text>
-             </Pressable>
-           </View>
-         ) : profile ? (
-           <View style={styles.card}>
-             <Text style={styles.text}>
-               Name: {profile.name || '—'}
-             </Text>
+           <Pressable
+             accessibilityRole="button"
+             style={styles.retryButton}
+             onPress={loadProfile}
+           >
+             <Text style={styles.buttonText}>Try Again</Text>
+           </Pressable>
+         </View>
+       ) : profile ? (
+         <View style={styles.card}>
+           <Text style={styles.text}>
+             Name: {`${profile.firstName} ${profile.lastName}`.trim()}
+           </Text>
 
-             <Text style={styles.text}>
-               Username: {profile.username || '—'}
-             </Text>
+           <Text style={styles.text}>
+             Username: {profile.username}
+           </Text>
 
-             <Text style={styles.text}>
-               Email: {profile.email || '—'}
-             </Text>
+           <Text style={styles.text}>
+             Email: {profile.email}
+           </Text>
 
-             <Text style={styles.text}>
-               Phone: {profile.phone || '—'}
-             </Text>
+           <Text style={styles.text}>
+             Phone: {profile.phone || '—'}
+           </Text>
 
-             <Text style={styles.text}>
-               Website: {profile.website || '—'}
-             </Text>
-           </View>
-         ) : (
-           <Text style={styles.text}>No profile available.</Text>
-         )}
+           <Text style={styles.text}>
+             University: {profile.university || '—'}
+           </Text>
 
-         <Text style={styles.text}>
-           Session Status: {token ? 'Authenticated' : 'Not Authenticated'}
-         </Text>
+           <Text style={styles.text}>
+             Role: {profile.role || 'user'}
+           </Text>
+         </View>
+       ) : (
+         <Text style={styles.text}>No profile available.</Text>
+       )}
 
-         <Pressable
-           accessibilityRole="button"
-           style={({ pressed }) => [
-             styles.button,
-             pressed && styles.buttonPressed,
-           ]}
-           onPress={logout}
-         >
-           <Text style={styles.buttonText}>LOGOUT</Text>
-         </Pressable>
-       </ScrollView>
-     );
-   }
+       <Text style={styles.text}>
+         Session Status: {token ? 'Authenticated' : 'Not Authenticated'}
+       </Text>
+
+       <Pressable
+         accessibilityRole="button"
+         style={({ pressed }) => [
+           styles.button,
+           pressed && styles.buttonPressed,
+         ]}
+         onPress={() => {
+           void logout();
+         }}
+       >
+         <Text style={styles.buttonText}>LOGOUT</Text>
+       </Pressable>
+     </ScrollView>
+   );
+ }
+
 
 const styles = StyleSheet.create({
   container: { flexGrow: 1, padding: 24, gap: 20, backgroundColor: '#f2f5fa' },
