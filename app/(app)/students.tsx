@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-unused-vars -- State setters and loader are exam placeholders. */
+//* eslint-disable @typescript-eslint/no-unused-vars -- State setters and loader are exam placeholders. */
 import { useEffect, useState , useCallback} from 'react';
 import {
   ActivityIndicator,
