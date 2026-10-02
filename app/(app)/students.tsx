@@ -7,6 +7,14 @@ import {
 import StudentCard, { type Student } from '@/components/StudentCard';
 import { API_BASE_URL } from '@/constants/api';
 
+type DummyUser = {
+  id: number;
+  firstName: string;
+  lastName: string;
+  email: string;
+  university?: string;
+};
+
 export default function StudentsScreen() {
   const [students, setStudents] = useState<Student[]>([]);
   const [loading, setLoading] = useState(true);
@@ -36,11 +44,25 @@ export default function StudentsScreen() {
 
         const data: unknown = await response.json();
 
-        if (!Array.isArray(data)) {
+        if (
+          typeof data !== 'object' ||
+          data === null ||
+          !('users' in data) ||
+          !Array.isArray(data.users)
+        ) {
           throw new Error('Invalid student data received.');
         }
 
-        setStudents(data as Student[]);
+        const apiUsers = data.users as DummyUser[];
+
+        const mappedStudents: Student[] = apiUsers.map((user) => ({
+          id: user.id,
+          name: `${user.firstName} ${user.lastName}`.trim(),
+          email: user.email,
+          course: user.university || null,
+        }));
+
+        setStudents(mappedStudents);
       } catch (error) {
         const message =
           error instanceof Error
