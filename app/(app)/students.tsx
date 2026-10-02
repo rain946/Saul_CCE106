@@ -1,7 +1,11 @@
 /* eslint-disable @typescript-eslint/no-unused-vars -- State setters and loader are exam placeholders. */
-import { useEffect, useState } from 'react';
-import { ActivityIndicator, FlatList, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
+import { useEffect, useState , useCallback} from 'react';
+import {
+  ActivityIndicator,
+  FlatList, Pressable, StyleSheet, Text, TextInput, View
+} from 'react-native';
 import StudentCard, { type Student } from '@/components/StudentCard';
+import { API_BASE_URL } from '@/constants/api';
 
 export default function StudentsScreen() {
   const [students, setStudents] = useState<Student[]>([]);
@@ -9,18 +13,53 @@ export default function StudentsScreen() {
   const [error, setError] = useState('');
   const [search, setSearch] = useState('');
 
-  const loadStudents = async () => {
+  const loadStudents =  useCallback (async () => {
     // TODO EXAM: 1. Set loading and clear previous errors.
     // TODO EXAM: 2. Call GET /students using fetch() and async/await.
     // TODO EXAM: 3. Include Authorization: Bearer TOKEN from useAuth() if required.
     // TODO EXAM: 4. Check response.ok and handle 401 Unauthorized.
     // TODO EXAM: 5. Parse JSON and save the student array to state.
     // TODO EXAM: 6. Handle errors and stop loading inside finally.
-  };
+    setLoading(true);
+    setError('');
+
+    try {
+        const response = await fetch(`${API_BASE_URL}/users`);
+
+        if (response.status === 401) {
+          throw new Error('Your session is unauthorized.');
+        }
+
+        if (!response.ok) {
+          throw new Error('Unable to load students.');
+        }
+
+        const data: unknown = await response.json();
+
+        if (!Array.isArray(data)) {
+          throw new Error('Invalid student data received.');
+        }
+
+        setStudents(data as Student[]);
+      } catch (error) {
+        const message =
+          error instanceof Error
+            ? error.message
+            : 'Something went wrong while loading students.';
+
+        setError(message);
+        setStudents([]);
+      } finally {
+        setLoading(false);
+      }
+    }, []);
+
+
 
   useEffect(() => {
     // TODO EXAM: Call loadStudents() when the screen loads.
-  }, []);
+    void loadStudents();
+      }, [loadStudents]);
 
   // TODO EXAM: Use filter() to return students whose name matches the search text.
   const normalizedSearch = search.trim().toLowerCase();
@@ -32,24 +71,59 @@ export default function StudentsScreen() {
 
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Students</Text>
-      <TextInput style={styles.input} accessibilityLabel="Search students" placeholder="Search by name" value={search} onChangeText={setSearch} />
-      {loading ? (
-        <View style={styles.state}><ActivityIndicator color="#245bb2" /><Text style={styles.text}>Loading students…</Text><Text style={styles.note}>Complete loadStudents() to finish this state.</Text></View>
-      ) : error ? (
-        <View style={styles.state} accessibilityLiveRegion="polite"><Text style={styles.error}>{error}</Text><Pressable accessibilityRole="button" onPress={loadStudents}><Text style={styles.link}>Try Again</Text></Pressable></View>
-      ) : (
-        <FlatList
-          data={filteredStudents}
-          keyExtractor={(item, index) => String(item.id ?? index)}
-          renderItem={({ item }) => <StudentCard student={item} />}
-          ListEmptyComponent={<View style={styles.state}><Text style={styles.text}>No students found.</Text></View>}
+      <View style={styles.container}>
+        <Text style={styles.title}>Students</Text>
+
+        <TextInput
+          style={styles.input}
+          accessibilityLabel="Search students"
+          placeholder="Search by name"
+          value={search}
+          onChangeText={setSearch}
+          autoCapitalize="none"
+          autoCorrect={false}
         />
-      )}
-    </View>
-  );
-}
+
+        {loading ? (
+          <View style={styles.state}>
+            <ActivityIndicator color="#245bb2" />
+            <Text style={styles.text}>Loading students…</Text>
+          </View>
+        ) : error ? (
+          <View style={styles.state} accessibilityLiveRegion="polite">
+            <Text style={styles.error}>{error}</Text>
+
+            <Pressable
+              accessibilityRole="button"
+              onPress={loadStudents}
+              style={({ pressed }) => [
+                styles.retryButton,
+                pressed && styles.buttonPressed,
+              ]}
+            >
+              <Text style={styles.retryText}>Try Again</Text>
+            </Pressable>
+          </View>
+        ) : (
+          <FlatList
+            data={filteredStudents}
+            keyExtractor={(item, index) => String(item.id ?? index)}
+            renderItem={({ item }) => <StudentCard student={item} />}
+            keyboardShouldPersistTaps="handled"
+            ListEmptyComponent={
+              <View style={styles.state}>
+                <Text style={styles.text}>
+                  {search.trim()
+                    ? 'No students match your search.'
+                    : 'No students found.'}
+                </Text>
+              </View>
+            }
+          />
+        )}
+      </View>
+    );
+  }
 
 const styles = StyleSheet.create({
   container: { flex: 1, padding: 24, backgroundColor: '#f2f5fa' },
@@ -60,4 +134,17 @@ const styles = StyleSheet.create({
   note: { color: '#536579', fontSize: 12 },
   error: { color: '#b42318' },
   link: { color: '#245bb2', padding: 12 },
+  retryButton: {
+     backgroundColor: '#245bb2',
+     paddingHorizontal: 20,
+     paddingVertical: 12,
+     borderRadius: 8,
+   },
+   retryText: {
+     color: '#ffffff',
+     fontWeight: '600',
+   },
+   buttonPressed: {
+     opacity: 0.7,
+   },
 });
